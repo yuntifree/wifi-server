@@ -14,6 +14,7 @@ import (
 func main() {
 	router := gin.Default()
 	router.POST("/feedback/:action", feedbackHandler)
+	router.POST("/banner/:action", bannerHandler)
 
 	srv := &http.Server{
 		Addr:    ":9898",
