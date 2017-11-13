@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package go.micro.srv.feedback;
+
+service Feedback {
+    rpc Add(Request) returns (Response) {}
+}
+
+message Request {
+    string phone = 1;
+    string content = 2;
+}
+
+message Response {
+    int64 code = 1;
+}
