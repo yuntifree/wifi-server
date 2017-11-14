@@ -15,6 +15,7 @@ func main() {
 	router := gin.Default()
 	router.POST("/feedback/:action", feedbackHandler)
 	router.POST("/banner/:action", bannerHandler)
+	router.GET("/jump/:filename", jumpHandler)
 
 	srv := &http.Server{
 		Addr:    ":9898",
