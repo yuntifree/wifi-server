@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package go.micro.srv.wx;
+
+service Wx {
+    rpc Login(LoginRequest) returns (LoginResponse) {}
+}
+
+message LoginRequest {
+    string code = 1;
+}
+
+message LoginResponse {
+    int64 uid = 1;
+    string token = 2;
+}

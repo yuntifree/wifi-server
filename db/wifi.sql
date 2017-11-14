@@ -1,5 +1,16 @@
 use wifi;
 
+CREATE TABLE IF NOT EXISTS users
+(
+    uid     int unsigned NOT NULL AUTO_INCREMENT,
+    username    varchar(36) NOT NULL,
+    phone       varchar(16) NOT NULL DEFAULT '',
+    token       varchar(36) NOT NULL DEFAULT '',
+    ctime       datetime NOT NULL DEFAULT '2017-11-01',
+    PRIMARY KEY(uid),
+    UNIQUE KEY(username)
+) ENGINE = InnoDB;
+
 CREATE TABLE IF NOT EXISTS banner
 (
     id      bigint unsigned NOT NULL AUTO_INCREMENT,

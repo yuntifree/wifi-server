@@ -16,6 +16,7 @@ func main() {
 	router.POST("/feedback/:action", feedbackHandler)
 	router.POST("/banner/:action", bannerHandler)
 	router.GET("/jump/:filename", jumpHandler)
+	router.GET("/weixin/login", loginHandler)
 
 	srv := &http.Server{
 		Addr:    ":9898",
