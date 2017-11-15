@@ -17,6 +17,7 @@ func main() {
 	router.POST("/banner/:action", bannerHandler)
 	router.POST("/park/:action", parkHandler)
 	router.POST("/phone/:action", phoneHandler)
+	router.POST("/hall/:action", hallHandler)
 	router.GET("/jump/:filename", jumpHandler)
 	router.GET("/weixin/login", loginHandler)
 
