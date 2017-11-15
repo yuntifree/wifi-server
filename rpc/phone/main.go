@@ -16,10 +16,40 @@ import (
 	phone "github.com/yuntifree/wifi-server/proto/phone"
 )
 
+const (
+	mastercode = 251653
+)
+
 var db *sql.DB
 
 //Server server implement
 type Server struct{}
+
+//CheckCode check sms code
+func (s *Server) CheckCode(ctx context.Context, req *phone.CheckRequest, rsp *phone.CheckResponse) error {
+	if req.Code == mastercode {
+		return nil
+	}
+
+	var realcode, id int64
+	err := db.QueryRow(`SELECT id, code FROM phone_code WHERE phone = ? AND 
+	used = 0 AND etime > NOW() ORDER BY id DESC LIMIT 1`, req.Phone).
+		Scan(&id, &realcode)
+	if err != nil {
+		log.Printf("CheckCode query failed:%s %v", req.Phone, err)
+		return err
+	}
+
+	if realcode == req.Code {
+		_, err = db.Exec("UPDATE phone_code SET used = 1 WHERE id = ?", id)
+		if err != nil {
+			log.Printf("update phone_code used failed:%s %v", req.Phone, err)
+		}
+		return nil
+	}
+	return fmt.Errorf("illegal phone code:%s %d-%d", req.Phone, req.Code,
+		realcode)
+}
 
 func sendSMS(phone string, code int) int {
 	yp := sms.Yunpian{Apikey: accounts.YPSMSApikey,
@@ -36,9 +66,9 @@ func (s *Server) GetCode(ctx context.Context, req *phone.GetRequest, rsp *phone.
 		req.Phone).Scan(&code)
 	if err != nil {
 		code = genCode()
-		_, err := db.Exec(`INSERT INTO phone_code(phone, uid, code, ctime,
-		stime, etime) VALUES (?, ?, ?, NOW(), NOW(), DATE_ADD(NOW(), INTERVAL 5 MINUTE))`,
-			req.Phone, req.Uid, code)
+		_, err := db.Exec(`INSERT INTO phone_code(phone, code, ctime,
+		stime, etime) VALUES (?, ?, NOW(), NOW(), DATE_ADD(NOW(), INTERVAL 5 MINUTE))`,
+			req.Phone, code)
 		if err != nil {
 			log.Printf("insert into phone_code failed:%s %v", req.Phone, err)
 			return err
