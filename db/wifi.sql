@@ -72,3 +72,13 @@ CREATE TABLE IF NOT EXISTS phone_code
     KEY(phone),
     KEY(ctime)
 ) ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS trial
+(
+    id      int unsigned NOT NULL AUTO_INCREMENT,
+    wid     int unsigned NOT NULL,
+    ctime   datetime NOT NULL DEFAULT '2017-11-01',
+    etime   datetime NOT NULL DEFAULT '2017-11-01',
+    PRIMARY KEY(id),
+    UNIQUE KEY(wid)
+) ENGINE = InnoDB;

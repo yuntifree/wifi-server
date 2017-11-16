@@ -34,6 +34,7 @@ func getPhoneCode(c *gin.Context) {
 	if req.Phone == "" {
 		c.JSON(http.StatusOK, gin.H{"errno": 2, "desc": "illegal param"})
 	}
+	log.Printf("getPhoneCode req:%+v", req)
 	cl := phone.NewPhoneClient(phoneName, client.DefaultClient)
 	_, err := cl.GetCode(context.Background(), &req)
 	if err != nil {

@@ -38,6 +38,7 @@ func loginHall(c *gin.Context) {
 	var req loginHallRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusOK, gin.H{"errno": errParam, "desc": err.Error()})
+		return
 	}
 	log.Printf("loginHall req:%+v", req)
 	var check phone.CheckRequest
@@ -48,6 +49,7 @@ func loginHall(c *gin.Context) {
 	if err != nil {
 		log.Printf("loginHall CheckCode failed:%v", err)
 		c.JSON(http.StatusOK, gin.H{"errno": errCheckCode, "desc": "验证码错误"})
+		return
 	}
 	var login hall.LoginRequest
 	login.Phone = req.Phone
@@ -57,10 +59,12 @@ func loginHall(c *gin.Context) {
 	if err != nil {
 		log.Printf("loginHall Login failed:%v", err)
 		c.JSON(http.StatusOK, gin.H{"errno": errCheckCode, "desc": "验证码错误"})
+		return
 	}
 	var co http.Cookie
 	co.Name = "wid"
 	co.Value = fmt.Sprintf("%d", res.Wid)
 	http.SetCookie(c.Writer, &co)
 	c.JSON(http.StatusOK, gin.H{"errno": errOK})
+	return
 }

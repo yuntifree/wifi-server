@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package go.micro.srv.trial;
+
+service Trial {
+    rpc Info(Request) returns (InfoResponse) {}
+    rpc Apply(Request) returns (ApplyResponse) {}
+}
+
+message Request {
+    int64 wid = 1;
+}
+
+message InfoResponse {
+    int64 used = 1;
+}
+
+message ApplyResponse {
+}
