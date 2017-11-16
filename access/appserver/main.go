@@ -22,6 +22,7 @@ func main() {
 	router.POST("/business/:action", businessHandler)
 	router.GET("/jump/:filename", jumpHandler)
 	router.GET("/weixin/login", loginHandler)
+	router.Static("/static/", "/data/wifi/html")
 
 	srv := &http.Server{
 		Addr:    ":9898",
