@@ -61,10 +61,18 @@ func loginHall(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"errno": errCheckCode, "desc": "验证码错误"})
 		return
 	}
-	var co http.Cookie
-	co.Name = "wid"
-	co.Value = fmt.Sprintf("%d", res.Wid)
-	http.SetCookie(c.Writer, &co)
+	{
+		var co http.Cookie
+		co.Name = "wid"
+		co.Value = fmt.Sprintf("%d", res.Wid)
+		http.SetCookie(c.Writer, &co)
+	}
+	{
+		var co http.Cookie
+		co.Name = "phone"
+		co.Value = req.Phone
+		http.SetCookie(c.Writer, &co)
+	}
 	c.JSON(http.StatusOK, gin.H{"errno": errOK})
 	return
 }
