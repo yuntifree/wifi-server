@@ -19,6 +19,7 @@ func main() {
 	router.POST("/phone/:action", phoneHandler)
 	router.POST("/hall/:action", hallHandler)
 	router.POST("/trial/:action", trialHandler)
+	router.POST("/business/:action", businessHandler)
 	router.GET("/jump/:filename", jumpHandler)
 	router.GET("/weixin/login", loginHandler)
 

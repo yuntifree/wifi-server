@@ -82,3 +82,14 @@ CREATE TABLE IF NOT EXISTS trial
     PRIMARY KEY(id),
     UNIQUE KEY(wid)
 ) ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS items
+(
+    id      int unsigned NOT NULL AUTO_INCREMENT,
+    title   varchar(256) NOT NULL,
+    price   int unsigned NOT NULL DEFAULT 0,
+    online  tinyint unsigned NOT NULL DEFAULT 0,
+    deleted tinyint unsigned NOT NULL DEFAULT 0,
+    ctime   datetime NOT NULL DEFAULT '2017-11-01',
+    PRIMARY KEY(id)
+) ENGINE = InnoDB;
