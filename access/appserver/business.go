@@ -4,7 +4,6 @@ import (
 	"context"
 	"log"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/micro/go-micro/client"
@@ -28,12 +27,7 @@ func businessHandler(c *gin.Context) {
 }
 
 func getBusinessInfo(c *gin.Context) {
-	id, err := c.Cookie("wid")
-	if err != nil {
-		c.JSON(http.StatusOK, gin.H{"errno": errParam, "desc": "illegal param"})
-		return
-	}
-	wid, err := strconv.Atoi(id)
+	wid := getCookieInt(c, "wid")
 	var req business.Request
 	req.Wid = int64(wid)
 	cl := business.NewBusinessClient(businessName, client.DefaultClient)

@@ -4,7 +4,6 @@ import (
 	"context"
 	"log"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/micro/go-micro/client"
@@ -30,12 +29,7 @@ func trialHandler(c *gin.Context) {
 }
 
 func getTrialInfo(c *gin.Context) {
-	id, err := c.Cookie("wid")
-	if err != nil {
-		c.JSON(http.StatusOK, gin.H{"errno": errParam, "desc": "illegal param"})
-		return
-	}
-	wid, err := strconv.Atoi(id)
+	wid := getCookieInt(c, "wid")
 	var req trial.Request
 	req.Wid = int64(wid)
 	cl := trial.NewTrialClient(trialName, client.DefaultClient)
@@ -49,16 +43,11 @@ func getTrialInfo(c *gin.Context) {
 }
 
 func applyTrial(c *gin.Context) {
-	id, err := c.Cookie("wid")
-	if err != nil {
-		c.JSON(http.StatusOK, gin.H{"errno": errParam, "desc": "illegal param"})
-		return
-	}
-	wid, err := strconv.Atoi(id)
+	wid := getCookieInt(c, "wid")
 	var req trial.Request
 	req.Wid = int64(wid)
 	cl := trial.NewTrialClient(trialName, client.DefaultClient)
-	_, err = cl.Apply(context.Background(), &req)
+	_, err := cl.Apply(context.Background(), &req)
 	if err != nil {
 		log.Printf("applyTrial Apply failed:%d %v", wid, err)
 		c.JSON(http.StatusOK, gin.H{"errno": errParam, "desc": "illegal param"})
