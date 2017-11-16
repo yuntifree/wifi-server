@@ -2,6 +2,12 @@
 
 
 [[projects]]
+  name = "github.com/bitly/go-simplejson"
+  packages = ["."]
+  revision = "aabad6e819789e569bd6aabf444c935aa9ba1e44"
+  version = "v0.5.0"
+
+[[projects]]
   branch = "master"
   name = "github.com/gin-contrib/sse"
   packages = ["."]
@@ -134,10 +140,22 @@
   version = "v0.8.0"
 
 [[projects]]
+  name = "github.com/satori/go.uuid"
+  packages = ["."]
+  revision = "879c5887cd475cd7864858769793b2ceb0d44feb"
+  version = "v1.1.0"
+
+[[projects]]
   branch = "master"
   name = "github.com/ugorji/go"
   packages = ["codec"]
   revision = "dd3aa7221b0c7a61c3ea1a0a252d06efa5161e3f"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/yuntifree/components"
+  packages = ["httputil","sms","weixin"]
+  revision = "5d12f4f5eeb983763ea59fff684182a4947d42ec"
 
 [[projects]]
   branch = "master"
@@ -166,6 +184,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "d7edeb397fe0f2845110c09af7e6ffd7a293300bc3d9808761df3adfff599876"
+  inputs-digest = "ab632cf59213f34a863ab868213520907d34a715493c99c8d32e5e25264a756d"
   solver-name = "gps-cdcl"
   solver-version = 1
