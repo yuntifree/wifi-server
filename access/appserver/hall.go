@@ -14,6 +14,7 @@ import (
 
 const (
 	hallName = "go.micro.srv.hall"
+	domain   = "asr.yunxingzh.com"
 )
 
 func hallHandler(c *gin.Context) {
@@ -64,12 +65,16 @@ func loginHall(c *gin.Context) {
 	{
 		var co http.Cookie
 		co.Name = "wid"
+		co.Path = "/"
+		co.Domain = domain
 		co.Value = fmt.Sprintf("%d", res.Wid)
 		http.SetCookie(c.Writer, &co)
 	}
 	{
 		var co http.Cookie
 		co.Name = "phone"
+		co.Path = "/"
+		co.Domain = domain
 		co.Value = req.Phone
 		http.SetCookie(c.Writer, &co)
 	}
