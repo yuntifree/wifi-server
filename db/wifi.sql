@@ -93,3 +93,21 @@ CREATE TABLE IF NOT EXISTS items
     ctime   datetime NOT NULL DEFAULT '2017-11-01',
     PRIMARY KEY(id)
 ) ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS orders
+(
+    id      bigint unsigned NOT NULL AUTO_INCREMENT,
+    oid     varchar(64) NOT NULL,
+    uid     int unsigned NOT NULL DEFAULT 0,
+    wid     int unsigned NOT NULL DEFAULT 0,
+    item    int unsigned NOT NULL DEFAULT 0,
+    price   int unsigned NOT NULL DEFAULT 0,
+    fee     int unsigned NOT NULL DEFAULT 0,
+    prepayid    varchar(64) NOT NULL DEFAULT '',
+    ctime   datetime NOT NULL DEFAULT '2017-11-01',
+    ftime   datetime NOT NULL DEFAULT '2017-11-01',
+    -- status 0:未支付 1:支付成功
+    status  tinyint unsigned NOT NULL DEFAULT 0,
+    PRIMARY KEY(id),
+    UNIQUE KEY(oid)
+) ENGINE = InnoDB;
