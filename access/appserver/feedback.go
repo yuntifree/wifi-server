@@ -29,7 +29,7 @@ func feedbackHandler(c *gin.Context) {
 
 func addFeedback(c *gin.Context) {
 	var json feedback.Request
-	if err := c.ShouldBindJSON(&json); err != nil {
+	if err := c.BindJSON(&json); err != nil {
 		c.JSON(http.StatusOK, gin.H{"errno": 1, "desc": err.Error()})
 		return
 	}

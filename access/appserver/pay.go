@@ -43,7 +43,7 @@ type payReq struct {
 
 func wxPay(c *gin.Context) {
 	var p payReq
-	if err := c.ShouldBindJSON(&p); err != nil {
+	if err := c.BindJSON(&p); err != nil {
 		c.JSON(http.StatusOK, gin.H{"errno": 1, "desc": err.Error()})
 		return
 	}

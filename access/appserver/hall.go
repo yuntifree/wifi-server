@@ -37,7 +37,7 @@ type loginHallRequest struct {
 
 func loginHall(c *gin.Context) {
 	var req loginHallRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
+	if err := c.BindJSON(&req); err != nil {
 		c.JSON(http.StatusOK, gin.H{"errno": errParam, "desc": err.Error()})
 		return
 	}

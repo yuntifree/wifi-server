@@ -28,7 +28,7 @@ func phoneHandler(c *gin.Context) {
 
 func getPhoneCode(c *gin.Context) {
 	var req phone.GetRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
+	if err := c.BindJSON(&req); err != nil {
 		c.JSON(http.StatusOK, gin.H{"errno": 1, "desc": err.Error()})
 	}
 	if req.Phone == "" {
