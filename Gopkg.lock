@@ -14,10 +14,10 @@
   revision = "22d885f9ecc78bf4ee5d72b937e4bbcdc58e8cae"
 
 [[projects]]
-  branch = "master"
   name = "github.com/gin-gonic/gin"
-  packages = [".","binding","json","render"]
-  revision = "ae9f03e6e80212e45427f811683f2a512cc8f506"
+  packages = [".","binding","render"]
+  revision = "d459835d2b077e44f7c9b453505ee29881d5d12d"
+  version = "v1.2"
 
 [[projects]]
   name = "github.com/go-log/log"
@@ -35,13 +35,13 @@
   branch = "master"
   name = "github.com/golang/protobuf"
   packages = ["proto"]
-  revision = "1643683e1b54a9e88ad26d98f81400c8c9d9f4f9"
+  revision = "1e59b77b52bf8e4b449a57e6f79f21226d571845"
 
 [[projects]]
   name = "github.com/hashicorp/consul"
   packages = ["api","watch"]
-  revision = "51ea240df8476e02215d53fbfad5838bf0d44d21"
-  version = "v1.0.0"
+  revision = "9564c2978b59c060aed0657e662a4eb1c6f35356"
+  version = "v1.0.1"
 
 [[projects]]
   branch = "master"
@@ -60,12 +60,6 @@
   packages = ["coordinate"]
   revision = "d6574a5bb1226678d7010325fb6c985db20ee458"
   version = "v0.8.1"
-
-[[projects]]
-  name = "github.com/json-iterator/go"
-  packages = ["."]
-  revision = "6240e1e7983a85228f7fd9c3e1b6932d46ec58e2"
-  version = "1.0.3"
 
 [[projects]]
   name = "github.com/mattn/go-isatty"
@@ -113,7 +107,7 @@
   branch = "master"
   name = "github.com/miekg/dns"
   packages = [".","internal/socket"]
-  revision = "9fc4eb252eedf0ef8adc05169ce35da5e31beaba"
+  revision = "acff9ce3fa5f04b7abb500613e6ee80c45321c47"
 
 [[projects]]
   branch = "master"
@@ -126,6 +120,12 @@
   name = "github.com/mitchellh/hashstructure"
   packages = ["."]
   revision = "2bca23e0e452137f789efbc8610126fd8b94f73b"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/mitchellh/mapstructure"
+  packages = ["."]
+  revision = "06020f85339e21b2478f756a78e295255ffa4d6a"
 
 [[projects]]
   name = "github.com/pborman/uuid"
@@ -149,25 +149,25 @@
   branch = "master"
   name = "github.com/ugorji/go"
   packages = ["codec"]
-  revision = "dd3aa7221b0c7a61c3ea1a0a252d06efa5161e3f"
+  revision = "a437b1adc2d23f710b6cebba4e8081c9469374d6"
 
 [[projects]]
   branch = "master"
   name = "github.com/yuntifree/components"
-  packages = ["httputil","sms","weixin"]
-  revision = "5d12f4f5eeb983763ea59fff684182a4947d42ec"
+  packages = ["httputil","sms","strutil","weixin"]
+  revision = "970c906ce3d364447f051b9fbd71982606daf1a2"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/net"
   packages = ["bpf","context","internal/iana","internal/socket","ipv4","ipv6"]
-  revision = "a337091b0525af65de94df2eb7e98bd9962dcbe2"
+  revision = "9dfe39835686865bff950a07b394c12a98ddc811"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
-  revision = "1e2299c37cc91a509f1b12369872d27be0ce98a6"
+  revision = "328643532ee3c60c099171d4ce2cad0ca0354ca9"
 
 [[projects]]
   name = "gopkg.in/go-playground/validator.v8"
@@ -179,11 +179,11 @@
   branch = "v2"
   name = "gopkg.in/yaml.v2"
   packages = ["."]
-  revision = "eb3733d160e74a9c7e442f435eb3bea458e1d19f"
+  revision = "287cf08546ab5e7e37d55a84f7ed3fd1db036de5"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "ab632cf59213f34a863ab868213520907d34a715493c99c8d32e5e25264a756d"
+  inputs-digest = "fa94460e4529a4d0c4379c46333dec6a84cd5ee24ba0f1c92ff6c3fb84ab5238"
   solver-name = "gps-cdcl"
   solver-version = 1
