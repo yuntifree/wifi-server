@@ -115,6 +115,46 @@ func recordPrepayid(db *sql.DB, id int64, prepayid string) {
 	}
 }
 
+//WxPayCB weixin pay callback
+func (s *Server) WxPayCB(ctx context.Context, req *pay.WxCBRequest, rsp *pay.WxCBResponse) error {
+	log.Printf("WxPayCB request:%+v", req)
+	var id, item, wid, price, status, mon int64
+	var prepayid string
+	err := db.QueryRow(`SELECT o.id, o.wid, o.item, o.price, o.status, o.prepayid, 
+	i.mon FROM orders o, items i WHERE o.oid = ?`, req.Oid).
+		Scan(&id, &wid, &item, &price, &status, &prepayid, &mon)
+	if err != nil {
+		log.Printf("WxPayCB query order info failed:%s %v", req.Oid, err)
+		return err
+	}
+	if status == 1 {
+		log.Printf("WxPayCB has duplicated oid:%s", req.Oid)
+		return nil
+	}
+	if price > req.Fee {
+		log.Printf("WxPayCB illegal fee, oid:%s %d-%d", req.Oid, price, req.Fee)
+		return fmt.Errorf("illegal feed oid:%s %d-%d", req.Oid, price, req.Fee)
+	}
+	_, err = db.Exec(`UPDATE orders SET status = 1, fee = ?, ftime = NOW() 
+	WHERE id = ?`, id)
+	if err != nil {
+		log.Printf("WxPayCB update order info failed, oid:%s fee:%d", req.Oid,
+			req.Fee)
+		return fmt.Errorf("update order info failed, oid:%s fee:%d", req.Oid,
+			req.Fee)
+	}
+
+	log.Printf("after update orders status:%s", req.Oid)
+	_, err = db.Exec(`UPDATE wifi_account SET bitmap = bitmap | 2, 
+	etime = IF(etime > NOW(), DATE_ADD(etime, INTERVAL ? MONTH),
+	DATE_ADD(NOW(), INTERVAL ? MONTH)) WHERE  id = ?`, mon, mon, wid)
+	if err != nil {
+		log.Printf("update account info failed:%d %d", wid, mon)
+		return fmt.Errorf("update account info failed:%d %d", wid, mon)
+	}
+	return nil
+}
+
 func main() {
 	var err error
 	db, err = dbutil.NewDB()

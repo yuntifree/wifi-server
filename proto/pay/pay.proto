@@ -4,6 +4,7 @@ package go.micro.srv.pay;
 
 service Pay {
     rpc WxPay(WxPayRequest) returns (WxPayResponse) {}
+    rpc WxPayCB(WxCBRequest) returns (WxCBResponse) {}
 }
 
 message WxPayRequest {
@@ -21,4 +22,12 @@ message WxPayResponse {
     string nonce = 3;
     int64 ts = 4;
     string signtype = 5;
+}
+
+message WxCBRequest {
+    string oid = 1;
+    int64 fee = 2;
+}
+
+message WxCBResponse {
 }
