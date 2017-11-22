@@ -5,6 +5,27 @@ package go.micro.srv.verify;
 service Verify {
     rpc CheckLogin(CheckRequest) returns (CheckResponse) {}
     rpc GetCheckCode(CodeRequest) returns (CodeResponse) {}
+    rpc PortalLogin(PortalLoginRequest) returns  (LoginResponse) {}
+}
+
+message PortalLoginRequest {
+    string phone = 1;
+    string code = 2;
+    string acname = 3;
+    string userip = 4;
+    string acip = 5;
+    string usermac = 6;
+    string apmac = 7;
+}
+
+message LoginResponse {
+    int64 uid = 1;
+    string token = 2;
+    string portaldir = 3;
+    int64 portaltype = 4;
+    int64 adtype = 5;
+    string cover = 6;
+    string dst = 7;
 }
 
 message CodeRequest {

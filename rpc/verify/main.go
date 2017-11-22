@@ -1,31 +1,119 @@
 package main
 
 import (
-	"Server/zte"
 	"database/sql"
 	"errors"
 	"log"
+	"strings"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 	micro "github.com/micro/go-micro"
+	"github.com/yuntifree/components/zte"
 	"github.com/yuntifree/wifi-server/dbutil"
 	verify "github.com/yuntifree/wifi-server/proto/verify"
 	"golang.org/x/net/context"
 )
 
 const (
-	adImg     = "http://img.yunxingzh.com/115cebf5-2ad3-458f-bc2c-48c667eacd52.png"
-	wxAppid   = "wx0898ab51f688ee64"
-	wxSecret  = "bf430af449b70efc04f11964bc5968a3"
-	wxShopid  = "3535655"
-	wxAuthURL = "http://wx.yunxingzh.com/auth"
+	adImg       = "http://img.yunxingzh.com/115cebf5-2ad3-458f-bc2c-48c667eacd52.png"
+	wxAppid     = "wx0898ab51f688ee64"
+	wxSecret    = "bf430af449b70efc04f11964bc5968a3"
+	wxShopid    = "3535655"
+	wxAuthURL   = "http://wx.yunxingzh.com/auth"
+	testAcname  = "2043.0769.200.00"
+	testAcip    = "120.197.159.10"
+	testUserip  = "10.96.72.28"
+	testUsermac = "f45c89987347"
+	portalDir   = "portal0406201704201946/index0406.html"
 )
 
 var db *sql.DB
 
 //Server server implement
 type Server struct{}
+
+//PortalLogin portal login
+func (s *Server) PortalLogin(ctx context.Context, req *verify.PortalLoginRequest,
+	rsp *verify.LoginResponse) error {
+	if !checkPhonePark(db, req.Phone, req.Apmac) {
+		return errors.New("请先到公众号开通上网服务")
+	}
+	stype := getAcSys(db, req.Acname)
+	if !checkZteCode(db, req.Phone, req.Code, stype) {
+		log.Printf("PortalLogin checkZteCode failed, phone:%s code:%s stype:%d",
+			req.Phone, req.Code, stype)
+		return errors.New("验证码错误")
+
+	}
+	if !isTestParam(req) {
+		flag, err := zteLogin(req.Phone, req.Userip,
+			req.Usermac, req.Acip, req.Acname, stype)
+		if !flag {
+			log.Printf("PortalLogin zteLogin retry failed, phone:%s code:%s",
+				req.Phone, req.Code)
+			return errors.New("登录失败")
+		}
+		if err != nil {
+			return err
+		}
+	}
+	var uid int64
+	var token string
+	err := db.QueryRow(`SELECT uid, token FROM users u, wifi_account w WHERE 
+	u.wifi = w.id AND w.phone = ?`, req.Phone).Scan(&uid, &token)
+	if err != nil {
+		return err
+	}
+	recordUserMac(db, req.Usermac, req.Phone)
+	rsp.Uid = uid
+	rsp.Token = token
+	rsp.Portaldir = portalDir
+	return nil
+}
+
+func recordUserMac(db *sql.DB, mac, phone string) {
+	mac = strings.Replace(mac, ":", "", -1)
+	_, err := db.Exec(`INSERT INTO user_mac(mac, phone, ctime) 
+	VALUES (?, ?, NOW()) ON DUPLICATE KEY UPDATE mac = ?`,
+		mac, phone, mac)
+	if err != nil {
+		log.Printf("recordUserMac failed mac:%s phone:%s err:%v",
+			mac, phone, err)
+	}
+}
+
+func zteLogin(phone, userip, usermac, acip, acname string, stype uint) (bool, error) {
+	flag, err := zte.Loginnopass(phone, userip, usermac, acip, acname, stype)
+	if flag {
+		return true, nil
+	}
+	log.Printf("PortalLogin zte loginnopass failed, phone:%s stype:%d",
+		phone, stype)
+	return flag, err
+}
+
+func isTestParam(info *verify.PortalLoginRequest) bool {
+	if info.Acip == testAcip &&
+		info.Userip == testUserip && info.Usermac == testUsermac {
+		return true
+	}
+	return false
+}
+
+func checkZteCode(db *sql.DB, phone, code string, stype uint) bool {
+	var eCode string
+	err := db.QueryRow("SELECT code FROM zte_code WHERE type = ? AND phone = ?",
+		stype, phone).Scan(&eCode)
+	if err != nil {
+		log.Printf("checkZteCode query failed:%s %s %v", phone, code, err)
+		return false
+	}
+	if eCode == code {
+		return true
+	}
+	return false
+}
 
 //GetCheckCode get check code
 func (s *Server) GetCheckCode(ctx context.Context, req *verify.CodeRequest,
