@@ -111,3 +111,34 @@ CREATE TABLE IF NOT EXISTS orders
     PRIMARY KEY(id),
     UNIQUE KEY(oid)
 ) ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS user_mac 
+(
+    id      bigint unsigned NOT NULL AUTO_INCREMENT,
+    phone   varchar(16) NOT NULL,
+    mac     varchar(36) NOT NULL DEFAULT '',
+    ctime   datetime NOT NULL DEFAULT '2017-11-01',
+    PRIMARY KEY(id),
+    UNIQUE KEY(phone),
+    KEY(mac)
+) ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS ap_info
+(
+    id      bigint unsigned NOT NULL AUTO_INCREMENT,
+    mac     varchar(36) NOT NULL,
+    park    int unsigned NOT NULL DEFAULT 0,
+    ctime   datetime NOT NULL DEFAULT '2017-11-01',
+    PRIMARY KEY(id),
+    UNIQUE KEY(mac)
+) ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS ac_info
+(
+    id      bigint unsigned NOT NULL AUTO_INCREMENT,
+    name    varchar(64) NOT NULL,
+    ip      varchar(32) NOT NULL,
+    ctime   datetime NOT NULL DEFAULT '2017-11-01',
+    PRIMARY KEY(id),
+    UNIQUE KEY(name)
+) ENGINE = InnoDB;

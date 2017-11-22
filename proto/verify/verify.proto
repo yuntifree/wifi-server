@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package go.micro.srv.verify;
+
+service Verify {
+    rpc CheckLogin(CheckRequest) returns (CheckResponse) {}
+}
+
+message CheckRequest {
+    string usermac = 1;
+    string acname = 2;
+    string apmac = 3;
+}
+
+message CheckResponse {
+    int64 autologin = 1;
+    string img = 2;
+    string wxappid = 3;
+    string wxsecret = 4;
+    string wxshopid = 5;
+    string wxauthurl = 6;
+    int64 taobao = 7;
+    int64 logintype = 8;
+    string dst = 9;
+    string cover = 10;
+}
+
+
