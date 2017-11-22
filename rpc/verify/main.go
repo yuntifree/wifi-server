@@ -36,10 +36,10 @@ type Server struct{}
 //PortalLogin portal login
 func (s *Server) PortalLogin(ctx context.Context, req *verify.PortalLoginRequest,
 	rsp *verify.LoginResponse) error {
-	if !checkPhonePark(db, req.Phone, req.Apmac) {
+	if !checkPhonePark(db, req.Phone, req.Wlanapmac) {
 		return errors.New("请先到公众号开通上网服务")
 	}
-	stype := getAcSys(db, req.Acname)
+	stype := getAcSys(db, req.Wlanacname)
 	if !checkZteCode(db, req.Phone, req.Code, stype) {
 		log.Printf("PortalLogin checkZteCode failed, phone:%s code:%s stype:%d",
 			req.Phone, req.Code, stype)
@@ -47,8 +47,8 @@ func (s *Server) PortalLogin(ctx context.Context, req *verify.PortalLoginRequest
 
 	}
 	if !isTestParam(req) {
-		flag, err := zteLogin(req.Phone, req.Userip,
-			req.Usermac, req.Acip, req.Acname, stype)
+		flag, err := zteLogin(req.Phone, req.Wlanuserip,
+			req.Wlanusermac, req.Wlanacip, req.Wlanacname, stype)
 		if !flag {
 			log.Printf("PortalLogin zteLogin retry failed, phone:%s code:%s",
 				req.Phone, req.Code)
@@ -65,7 +65,7 @@ func (s *Server) PortalLogin(ctx context.Context, req *verify.PortalLoginRequest
 	if err != nil {
 		return err
 	}
-	recordUserMac(db, req.Usermac, req.Phone)
+	recordUserMac(db, req.Wlanusermac, req.Phone)
 	rsp.Uid = uid
 	rsp.Token = token
 	rsp.Portaldir = portalDir
@@ -94,8 +94,8 @@ func zteLogin(phone, userip, usermac, acip, acname string, stype uint) (bool, er
 }
 
 func isTestParam(info *verify.PortalLoginRequest) bool {
-	if info.Acip == testAcip &&
-		info.Userip == testUserip && info.Usermac == testUsermac {
+	if info.Wlanacip == testAcip &&
+		info.Wlanuserip == testUserip && info.Wlanusermac == testUsermac {
 		return true
 	}
 	return false
@@ -118,11 +118,11 @@ func checkZteCode(db *sql.DB, phone, code string, stype uint) bool {
 //GetCheckCode get check code
 func (s *Server) GetCheckCode(ctx context.Context, req *verify.CodeRequest,
 	rsp *verify.CodeResponse) error {
-	if !checkPhonePark(db, req.Phone, req.Apmac) {
+	if !checkPhonePark(db, req.Phone, req.Wlanapmac) {
 		return errors.New("请先到公众号开通上网服务")
 	}
 	var stype uint
-	stype = getAcSys(db, req.Acname)
+	stype = getAcSys(db, req.Wlanacname)
 	if isExceedCodeFrequency(db, req.Phone, stype) {
 		log.Printf("GetCheckCode isExceedCodeFrequency phone:%s", req.Phone)
 		return errors.New("超过频率限制")
@@ -196,7 +196,7 @@ func isExceedCodeFrequency(db *sql.DB, phone string, stype uint) bool {
 //CheckLogin check login
 func (s *Server) CheckLogin(ctx context.Context, req *verify.CheckRequest,
 	rsp *verify.CheckResponse) error {
-	rsp.Autologin = isAutoMac(db, req.Usermac, req.Apmac)
+	rsp.Autologin = isAutoMac(db, req.Wlanusermac, req.Wlanapmac)
 	rsp.Img = adImg
 	rsp.Wxappid = wxAppid
 	rsp.Wxsecret = wxSecret

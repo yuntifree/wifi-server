@@ -14,13 +14,7 @@ const (
 )
 
 type checkRequest struct {
-	Data checkData `json:"data"`
-}
-
-type checkData struct {
-	WlanUsermac string `json:"wlanusermac"`
-	WlanAcname  string `json:"wlanacname"`
-	WlanApmac   string `json:"wlanapmac"`
+	Data verify.CheckRequest `json:"data"`
 }
 
 func checkLoginHandler(c *gin.Context) {
@@ -29,12 +23,8 @@ func checkLoginHandler(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"errno": 1, "desc": err.Error()})
 		return
 	}
-	var req verify.CheckRequest
-	req.Usermac = p.Data.WlanUsermac
-	req.Acname = p.Data.WlanAcname
-	req.Apmac = p.Data.WlanApmac
 	cl := verify.NewVerifyClient(verifyName, client.DefaultClient)
-	rsp, err := cl.CheckLogin(context.Background(), &req)
+	rsp, err := cl.CheckLogin(context.Background(), &p.Data)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"errno": 1, "desc": err.Error()})
 		return
@@ -47,13 +37,7 @@ func checkLoginHandler(c *gin.Context) {
 }
 
 type codeRequest struct {
-	Data codeData `json:"data"`
-}
-
-type codeData struct {
-	Phone      string `json:"phone"`
-	WlanAcname string `json:"wlanacname"`
-	WlanApmac  string `json:"wlanapmac"`
+	Data verify.CodeRequest `json:"data"`
 }
 
 func getCodeHandler(c *gin.Context) {
@@ -62,12 +46,8 @@ func getCodeHandler(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"errno": 1, "desc": err.Error()})
 		return
 	}
-	var req verify.CodeRequest
-	req.Phone = p.Data.Phone
-	req.Acname = p.Data.WlanAcname
-	req.Apmac = p.Data.WlanApmac
 	cl := verify.NewVerifyClient(verifyName, client.DefaultClient)
-	_, err := cl.GetCheckCode(context.Background(), &req)
+	_, err := cl.GetCheckCode(context.Background(), &p.Data)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"errno": 1, "desc": err.Error()})
 		return
@@ -76,17 +56,7 @@ func getCodeHandler(c *gin.Context) {
 }
 
 type portalRequest struct {
-	Data portalData `json:"data"`
-}
-
-type portalData struct {
-	Phone       string `json:"phone"`
-	Code        string `json:"code"`
-	WlanAcname  string `json:"wlanacname"`
-	WlanApmac   string `json:"wlanapmac"`
-	WlanAcip    string `json:"wlanacip"`
-	WlanUserip  string `json:"wlanuserip"`
-	WlanUsermac string `json:"wlanusermac"`
+	Data verify.PortalLoginRequest `json:"data"`
 }
 
 func portalLoginHandler(c *gin.Context) {
@@ -95,16 +65,8 @@ func portalLoginHandler(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"errno": 1, "desc": err.Error()})
 		return
 	}
-	var req verify.PortalLoginRequest
-	req.Phone = p.Data.Phone
-	req.Code = p.Data.Code
-	req.Acname = p.Data.WlanAcname
-	req.Apmac = p.Data.WlanApmac
-	req.Userip = p.Data.WlanUserip
-	req.Acip = p.Data.WlanAcip
-	req.Usermac = p.Data.WlanUsermac
 	cl := verify.NewVerifyClient(verifyName, client.DefaultClient)
-	rsp, err := cl.PortalLogin(context.Background(), &req)
+	rsp, err := cl.PortalLogin(context.Background(), &p.Data)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"errno": 1, "desc": err.Error()})
 		return

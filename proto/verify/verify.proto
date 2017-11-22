@@ -11,11 +11,11 @@ service Verify {
 message PortalLoginRequest {
     string phone = 1;
     string code = 2;
-    string acname = 3;
-    string userip = 4;
-    string acip = 5;
-    string usermac = 6;
-    string apmac = 7;
+    string wlanacname = 3;
+    string wlanuserip = 4;
+    string wlanacip = 5;
+    string wlanusermac = 6;
+    string wlanapmac = 7;
 }
 
 message LoginResponse {
@@ -30,17 +30,17 @@ message LoginResponse {
 
 message CodeRequest {
     string phone = 1;
-    string acname = 2;
-    string apmac = 3;
+    string wlanacname = 2;
+    string wlanapmac = 3;
 }
 
 message CodeResponse {
 }
 
 message CheckRequest {
-    string usermac = 1;
-    string acname = 2;
-    string apmac = 3;
+    string wlanusermac = 1;
+    string wlanacname = 2;
+    string wlanapmac = 3;
 }
 
 message CheckResponse {
