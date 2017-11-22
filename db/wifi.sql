@@ -138,7 +138,20 @@ CREATE TABLE IF NOT EXISTS ac_info
     id      bigint unsigned NOT NULL AUTO_INCREMENT,
     name    varchar(64) NOT NULL,
     ip      varchar(32) NOT NULL,
+    type    tinyint unsigned NOT NULL DEFAULT 0,
     ctime   datetime NOT NULL DEFAULT '2017-11-01',
     PRIMARY KEY(id),
     UNIQUE KEY(name)
+) ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS zte_code
+(
+    id      bigint unsigned NOT NULL AUTO_INCREMENT,
+    type    tinyint unsigned NOT NULL DEFAULT 0,
+    phone   varchar(16) NOT NULL,
+    code    varchar(16) NOT NULL,
+    ctime   datetime NOT NULL DEFAULT '2017-11-01',
+    mtime   datetime NOT NULL DEFAULT '2017-11-01',
+    PRIMARY KEY(id),
+    UNIQUE KEY(type, phone)
 ) ENGINE = InnoDB;

@@ -4,6 +4,16 @@ package go.micro.srv.verify;
 
 service Verify {
     rpc CheckLogin(CheckRequest) returns (CheckResponse) {}
+    rpc GetCheckCode(CodeRequest) returns (CodeResponse) {}
+}
+
+message CodeRequest {
+    string phone = 1;
+    string acname = 2;
+    string apmac = 3;
+}
+
+message CodeResponse {
 }
 
 message CheckRequest {

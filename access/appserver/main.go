@@ -22,6 +22,7 @@ func main() {
 	router.POST("/business/:action", businessHandler)
 	router.POST("/pay/:action", payHandler)
 	router.POST("/check_login", checkLoginHandler)
+	router.POST("/get_check_code", getCodeHandler)
 	router.GET("/jump/:filename", jumpHandler)
 	router.GET("/weixin/login", loginHandler)
 	router.Static("/static/", "/data/wifi/html")

@@ -1,7 +1,9 @@
 package main
 
 import (
+	"Server/zte"
 	"database/sql"
+	"errors"
 	"log"
 	"time"
 
@@ -24,6 +26,84 @@ var db *sql.DB
 
 //Server server implement
 type Server struct{}
+
+//GetCheckCode get check code
+func (s *Server) GetCheckCode(ctx context.Context, req *verify.CodeRequest,
+	rsp *verify.CodeResponse) error {
+	if !checkPhonePark(db, req.Phone, req.Apmac) {
+		return errors.New("请先到公众号开通上网服务")
+	}
+	var stype uint
+	stype = getAcSys(db, req.Acname)
+	if isExceedCodeFrequency(db, req.Phone, stype) {
+		log.Printf("GetCheckCode isExceedCodeFrequency phone:%s", req.Phone)
+		return errors.New("超过频率限制")
+	}
+	code, err := zte.Register(req.Phone, true, stype)
+	if err != nil {
+		log.Printf("GetCheckCode Register failed:%v", err)
+		return errors.New("账号注册失败")
+	}
+	log.Printf("recordZteCode phone:%s code:%s type:%d", req.Phone, code, stype)
+	recordZteCode(db, req.Phone, code, stype)
+	return nil
+}
+
+func checkPhonePark(db *sql.DB, phone, apmac string) bool {
+	var park, epark int64
+	err := db.QueryRow(`SELECT park FROM wifi_account WHERE phone = ?`, phone).
+		Scan(&park)
+	if err != nil {
+		return false
+	}
+	err = db.QueryRow(`SELECT park FROM ap_info WHERE mac = ?`, apmac).
+		Scan(&epark)
+	if err != nil {
+		return false
+	}
+	if park == epark {
+		return true
+	}
+	return false
+}
+
+func recordZteCode(db *sql.DB, phone, code string, stype uint) {
+	if code == "" {
+		return
+	}
+	_, err := db.Exec(`INSERT INTO zte_code(phone, code, type, ctime, mtime) 
+		VALUES (?, ?, ?, NOW(), NOW()) ON DUPLICATE KEY UPDATE code = ?, 
+		mtime = NOW()`,
+		phone, code, stype, code)
+	if err != nil {
+		log.Printf("recordZteCode query failed:%s %s %d %v", phone, code, stype, err)
+	}
+}
+
+func getAcSys(db *sql.DB, acname string) uint {
+	var stype uint
+	err := db.QueryRow("SELECT type FROM ac_info WHERE name = ?", acname).
+		Scan(&stype)
+	if err != nil {
+		log.Printf("getAcSys query failed:%v", err)
+	}
+	return stype
+}
+
+func isExceedCodeFrequency(db *sql.DB, phone string, stype uint) bool {
+	var flag int
+	err := db.QueryRow(`SELECT IF(NOW() > DATE_ADD(mtime, INTERVAL 5 MINUTE), 
+				0, 1) FROM zte_code WHERE phone = ? AND type = ?`,
+		phone, stype).Scan(&flag)
+	if err != nil && err != sql.ErrNoRows {
+		log.Printf("isExceedCodeFrequency query failed:%v", err)
+		return false
+	}
+	if flag > 0 {
+		return true
+	}
+	return false
+}
 
 //CheckLogin check login
 func (s *Server) CheckLogin(ctx context.Context, req *verify.CheckRequest,
