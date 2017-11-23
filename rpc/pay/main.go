@@ -27,6 +27,44 @@ var db *sql.DB
 //Server server implement
 type Server struct{}
 
+//GetTicket get weixin ticket
+func (s *Server) GetTicket(ctx context.Context, req *pay.TicketRequest,
+	rsp *pay.TicketResponse) error {
+	var token, ticket string
+	err := db.QueryRow(`SELECT access_token, api_ticket FROM wx_token
+	WHERE expire_time > NOW() AND appid = ?`, accounts.DgWxAppid).
+		Scan(&token, &ticket)
+	if err == nil && ticket != "" {
+		rsp.Token = token
+		rsp.Ticket = ticket
+		return nil
+	}
+	token, err = weixin.GetWxToken(accounts.DgWxAppid, accounts.DgWxAppkey)
+	if err != nil {
+		log.Printf("GetTicket GetWxToken failed:%v", err)
+		return err
+	}
+	ticket, err = weixin.GetWxJsapiTicket(token)
+	if err != nil {
+		log.Printf("GetTicket GetWxJsapiTicket failed:%v", err)
+		return err
+	}
+
+	updateTokenTicket(db, accounts.DgWxAppid, token, ticket)
+	rsp.Token = token
+	rsp.Ticket = ticket
+	return nil
+}
+
+func updateTokenTicket(db *sql.DB, appid, token, ticket string) {
+	_, err := db.Exec(`UPDATE wx_token SET access_token = ?, api_ticket = ?,
+			expire_time = DATE_ADD(NOW(), INTERVAL 1 HOUR) WHERE appid = ?`,
+		token, ticket, appid)
+	if err != nil {
+		log.Printf("updateTokenTicket failed:%v", err)
+	}
+}
+
 //WxPay weixin pay
 func (s *Server) WxPay(ctx context.Context, req *pay.WxPayRequest,
 	rsp *pay.WxPayResponse) error {

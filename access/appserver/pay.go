@@ -3,13 +3,17 @@ package main
 import (
 	"context"
 	"encoding/xml"
+	"fmt"
 	"io/ioutil"
 	"log"
+	"math/rand"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/micro/go-micro/client"
+	"github.com/yuntifree/components/strutil"
 	"github.com/yuntifree/components/weixin"
 	"github.com/yuntifree/wifi-server/accounts"
 	pay "github.com/yuntifree/wifi-server/proto/pay"
@@ -30,6 +34,8 @@ func payHandler(c *gin.Context) {
 		wxPay(c)
 	case "wx_pay_callback":
 		wxPayCB(c)
+	case "get_jsapi_sign":
+		getJsapiSign(c)
 	default:
 		c.JSON(http.StatusOK, gin.H{"errno": errAction, "desc": "unknown action"})
 	}
@@ -108,4 +114,40 @@ func wxPayCB(c *gin.Context) {
 		log.Printf("wxPayCB WxPayCB failed:%s %v", req.Oid, err)
 		return
 	}
+}
+
+func getJsapiSign(c *gin.Context) {
+	var req pay.TicketRequest
+	cl := pay.NewPayClient(payName, client.DefaultClient)
+	rsp, err := cl.GetTicket(context.Background(), &req)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{"errno": errParam, "desc": err.Error()})
+		return
+	}
+	noncestr := genNonce()
+	ts := time.Now().Unix()
+	url := c.Request.Referer()
+	pos := strings.Index(url, "#")
+	if pos != -1 {
+		url = url[:pos]
+	}
+
+	ori := fmt.Sprintf("jsapi_ticket=%s&noncestr=%s&timestamp=%d&url=%s",
+		rsp.Ticket, noncestr, ts, url)
+	sign := strutil.Sha1(ori)
+	log.Printf("origin:%s sign:%s\n", ori, sign)
+	out := fmt.Sprintf("var wx_cfg={\"debug\":false, \"appId\":\"%s\",\"timestamp\":%d,\"nonceStr\":\"%s\",\"signature\":\"%s\",\"jsApiList\":[],\"jsapi_ticket\":\"%s\"};",
+		accounts.DgWxAppid, ts, noncestr, sign, rsp.Ticket)
+	c.Data(http.StatusOK, "", []byte(out))
+}
+
+func genNonce() string {
+	nonce := "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	var res []byte
+	r := rand.New(rand.NewSource(time.Now().Unix()))
+	for i := 0; i < 12; i++ {
+		ch := nonce[r.Int31n(int32(len(nonce)))]
+		res = append(res, ch)
+	}
+	return string(res)
 }

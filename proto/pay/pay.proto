@@ -5,6 +5,15 @@ package go.micro.srv.pay;
 service Pay {
     rpc WxPay(WxPayRequest) returns (WxPayResponse) {}
     rpc WxPayCB(WxCBRequest) returns (WxCBResponse) {}
+    rpc GetTicket(TicketRequest) returns (TicketResponse) {}
+}
+
+message TicketRequest {
+}
+
+message TicketResponse {
+    string token = 1;
+    string ticket = 2;
 }
 
 message WxPayRequest {

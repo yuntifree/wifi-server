@@ -155,3 +155,15 @@ CREATE TABLE IF NOT EXISTS zte_code
     PRIMARY KEY(id),
     UNIQUE KEY(type, phone)
 ) ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS wx_token
+(
+    id      int unsigned NOT NULL AUTO_INCREMENT,
+    appid   varchar(32) NOT NULL,
+    secret  varchar(32) NOT NULL,
+    access_token varchar(256) NOT NULL DEFAULT '',
+    api_ticket varchar(128) NOT NULL DEFAULT '',
+    expire_time datetime NOT NULL DEFAULT '2017-11-01',
+    PRIMARY KEY(id),
+    UNIQUE KEY(appid)
+) ENGINE = InnoDB;
