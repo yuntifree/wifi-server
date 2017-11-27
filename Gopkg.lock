@@ -107,7 +107,7 @@
   branch = "master"
   name = "github.com/miekg/dns"
   packages = [".","internal/socket"]
-  revision = "acff9ce3fa5f04b7abb500613e6ee80c45321c47"
+  revision = "79bfde677fa81ff8d27c4330c35bda075d360641"
 
 [[projects]]
   branch = "master"
@@ -149,25 +149,25 @@
   branch = "master"
   name = "github.com/ugorji/go"
   packages = ["codec"]
-  revision = "a437b1adc2d23f710b6cebba4e8081c9469374d6"
+  revision = "84cb69a8af8316eed8cf4a3c9368a56977850062"
 
 [[projects]]
   branch = "master"
   name = "github.com/yuntifree/components"
-  packages = ["httputil","sms","strutil","weixin"]
-  revision = "970c906ce3d364447f051b9fbd71982606daf1a2"
+  packages = ["httputil","sms","strutil","weixin","zte"]
+  revision = "2d5f781773f327930806e69158cdcece79f8faaa"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/net"
   packages = ["bpf","context","internal/iana","internal/socket","ipv4","ipv6"]
-  revision = "9dfe39835686865bff950a07b394c12a98ddc811"
+  revision = "c7086645de248775cbf2373cf5ca4d2fa664b8c1"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
-  revision = "328643532ee3c60c099171d4ce2cad0ca0354ca9"
+  revision = "4ff8c001ce4cc464e644b922325097228fce14d8"
 
 [[projects]]
   name = "gopkg.in/go-playground/validator.v8"
@@ -184,6 +184,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "fa94460e4529a4d0c4379c46333dec6a84cd5ee24ba0f1c92ff6c3fb84ab5238"
+  inputs-digest = "084914d9a06626f100fd8c998325f45a34592f2fa3c0ed920bc060899861951c"
   solver-name = "gps-cdcl"
   solver-version = 1
