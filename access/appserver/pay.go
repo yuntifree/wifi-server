@@ -24,6 +24,7 @@ const (
 	succRsp  = "<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>"
 	failRsp  = "<xml><return_code><![CDATA[FAIL]]></return_code><return_msg><![CDATA[SERVER ERROR]]></return_msg></xml>"
 	succCode = "SUCCESS"
+	payHost  = "http://wxdev.yunxingzh.com"
 )
 
 func payHandler(c *gin.Context) {
@@ -34,8 +35,6 @@ func payHandler(c *gin.Context) {
 		wxPay(c)
 	case "wx_pay_callback":
 		wxPayCB(c)
-	case "get_jsapi_sign":
-		getJsapiSign(c)
 	default:
 		c.JSON(http.StatusOK, gin.H{"errno": errAction, "desc": "unknown action"})
 	}
@@ -62,8 +61,9 @@ func wxPay(c *gin.Context) {
 	req.Price = p.Price
 	ip := c.ClientIP()
 	callback := strings.Replace(c.Request.RequestURI, "wx_pay", "wx_pay_callback", -1)
+	log.Printf("callback:%s", callback)
 	req.Clientip = ip
-	req.Callback = callback
+	req.Callback = payHost + callback
 	cl := pay.NewPayClient(payName, client.DefaultClient)
 	rsp, err := cl.WxPay(context.Background(), &req)
 	if err != nil {
@@ -71,6 +71,7 @@ func wxPay(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"errno": errParam, "desc": "illegal param"})
 		return
 	}
+	log.Printf("rsp:%v", rsp)
 	c.JSON(http.StatusOK, gin.H{"errno": 0, "paySign": rsp.Sign,
 		"package": rsp.Pack, "timeStamp": rsp.Ts,
 		"nonceStr": rsp.Nonce, "signType": rsp.Signtype})
@@ -138,6 +139,7 @@ func getJsapiSign(c *gin.Context) {
 	log.Printf("origin:%s sign:%s\n", ori, sign)
 	out := fmt.Sprintf("var wx_cfg={\"debug\":false, \"appId\":\"%s\",\"timestamp\":%d,\"nonceStr\":\"%s\",\"signature\":\"%s\",\"jsApiList\":[],\"jsapi_ticket\":\"%s\"};",
 		accounts.DgWxAppid, ts, noncestr, sign, rsp.Ticket)
+	log.Printf("out:%s", out)
 	c.Data(http.StatusOK, "", []byte(out))
 }
 

@@ -14,7 +14,7 @@ import (
 
 const (
 	hallName = "go.micro.srv.hall"
-	domain   = "asr.yunxingzh.com"
+	domain   = "wxdev.yunxingzh.com"
 )
 
 func hallHandler(c *gin.Context) {

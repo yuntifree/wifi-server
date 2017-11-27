@@ -1,25 +1,24 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
+	"net/url"
 
 	"github.com/gin-gonic/gin"
-	"github.com/yuntifree/components/weixin"
 	"github.com/yuntifree/wifi-server/accounts"
 )
 
 const (
-	wxHost = "http://wx.yunxingzh.com/"
+	wxHost  = "http://wx.yunxingzh.com/GetWeixinCode/get-weixin-code.html"
+	logHost = "http://wxdev.yunxingzh.com/weixin/login"
 )
 
 func jumpHandler(c *gin.Context) {
-	filename := c.Param("filename")
-	log.Printf("filename:%s", filename)
-	echostr := wxHost + filename
-	redirect := wxHost + "weixin/login" + "?echostr=" + echostr
-	wx := weixin.WxInfo{Appid: accounts.DgWxAppid,
-		Appkey: accounts.DgWxAppkey}
-	dst := wx.GenRedirect(redirect)
-	c.Redirect(http.StatusMovedPermanently, dst)
+	url := fmt.Sprintf("%s?appid=%s&scope=snsapi_base&state=list&redirect_uri=%s",
+		wxHost, accounts.DgWxAppid, url.QueryEscape(logHost))
+	log.Printf("url:%s", url)
+	c.Header("Cache-Control", "no-store")
+	c.Redirect(http.StatusMovedPermanently, url)
 }

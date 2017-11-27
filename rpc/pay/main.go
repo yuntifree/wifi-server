@@ -165,6 +165,8 @@ func (s *Server) WxPayCB(ctx context.Context, req *pay.WxCBRequest, rsp *pay.WxC
 		log.Printf("WxPayCB query order info failed:%s %v", req.Oid, err)
 		return err
 	}
+	log.Printf("id:%d item:%d wid:%d price:%d stataus:%d, prepayid:%s",
+		id, item, wid, price, status, prepayid)
 	if status == 1 {
 		log.Printf("WxPayCB has duplicated oid:%s", req.Oid)
 		return nil
@@ -174,12 +176,12 @@ func (s *Server) WxPayCB(ctx context.Context, req *pay.WxCBRequest, rsp *pay.WxC
 		return fmt.Errorf("illegal feed oid:%s %d-%d", req.Oid, price, req.Fee)
 	}
 	_, err = db.Exec(`UPDATE orders SET status = 1, fee = ?, ftime = NOW() 
-	WHERE id = ?`, id)
+	WHERE id = ?`, req.Fee, id)
 	if err != nil {
-		log.Printf("WxPayCB update order info failed, oid:%s fee:%d", req.Oid,
-			req.Fee)
-		return fmt.Errorf("update order info failed, oid:%s fee:%d", req.Oid,
-			req.Fee)
+		log.Printf("WxPayCB update order info failed, oid:%s fee:%d %v", req.Oid,
+			req.Fee, err)
+		return fmt.Errorf("update order info failed, oid:%s fee:%d %v", req.Oid,
+			req.Fee, err)
 	}
 
 	log.Printf("after update orders status:%s", req.Oid)
