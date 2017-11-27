@@ -6,6 +6,15 @@ service Verify {
     rpc CheckLogin(CheckRequest) returns (CheckResponse) {}
     rpc GetCheckCode(CodeRequest) returns (CodeResponse) {}
     rpc PortalLogin(PortalLoginRequest) returns  (LoginResponse) {}
+    rpc OneClickLogin(OneClickRequest) returns (LoginResponse) {}
+}
+
+message OneClickRequest {
+    string wlanacname = 1;
+    string wlanuserip = 2;
+    string wlanacip = 3;
+    string wlanusermac = 4;
+    string wlanapmac = 5;
 }
 
 message PortalLoginRequest {

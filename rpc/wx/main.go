@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"database/sql"
 	"log"
 	"strings"
@@ -14,6 +13,7 @@ import (
 	"github.com/yuntifree/wifi-server/accounts"
 	"github.com/yuntifree/wifi-server/dbutil"
 	wx "github.com/yuntifree/wifi-server/proto/wx"
+	"golang.org/x/net/context"
 )
 
 var db *sql.DB
@@ -49,7 +49,7 @@ func (s *Server) Login(ctx context.Context, req *wx.LoginRequest, rsp *wx.LoginR
 			log.Printf("scan username failed:%s %v", uinfo.Openid, err)
 			return err
 		}
-		_, err = db.Exec(`UPDATE user SET token = ? WHERE uid = ?`, token, uid)
+		_, err = db.Exec(`UPDATE users SET token = ? WHERE uid = ?`, token, uid)
 		if err != nil {
 			log.Printf("update token failed:%v", err)
 			return err

@@ -24,8 +24,10 @@ func main() {
 	router.POST("/check_login", checkLoginHandler)
 	router.POST("/get_check_code", getCodeHandler)
 	router.POST("/portal_login", portalLoginHandler)
-	router.GET("/jump/:filename", jumpHandler)
+	router.POST("/one_click_login", oneClickLoginHandler)
+	router.GET("/jumpwx", jumpHandler)
 	router.GET("/weixin/login", loginHandler)
+	router.GET("/pay/get_jsapi_sign", getJsapiSign)
 	router.Static("/static/", "/data/wifi/html")
 
 	srv := &http.Server{

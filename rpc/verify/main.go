@@ -33,6 +33,82 @@ var db *sql.DB
 //Server server implement
 type Server struct{}
 
+//OneClickLogin one-click login
+func (s *Server) OneClickLogin(ctx context.Context, req *verify.OneClickRequest,
+	rsp *verify.LoginResponse) error {
+	var phone string
+	usermac := strings.Replace(req.Wlanusermac, ":", "", -1)
+	err := db.QueryRow(`SELECT phone FROM user_mac WHERE mac = ? LIMIT 1`, usermac).
+		Scan(&phone)
+	if err != nil {
+		log.Printf("OneClickLogin query phone failed:%v", err)
+		return err
+	}
+	stype := getAcSys(db, req.Wlanacname)
+	bitmap := getWifiBitmap(db, phone)
+	err = checkZteReg(db, bitmap, stype, phone)
+	if err != nil {
+		log.Printf("checkZteReg failed:%v", err)
+		return err
+	}
+	if !isTestClickParam(req) {
+		flag, err := zteLogin(phone, req.Wlanuserip,
+			req.Wlanusermac, req.Wlanacip, req.Wlanacname, stype)
+		if !flag {
+			log.Printf("OneClickLogin zteLogin retry failed, phone:%s ",
+				phone)
+			return errors.New("登录失败")
+		}
+		if err != nil {
+			return err
+		}
+	}
+
+	var uid int64
+	var token string
+	err = db.QueryRow(`SELECT uid, token FROM users u, wifi_account w WHERE 
+	u.wifi = w.id AND w.phone = ?`, phone).Scan(&uid, &token)
+	if err != nil {
+		return err
+	}
+	rsp.Uid = uid
+	rsp.Token = token
+	rsp.Portaldir = portalDir
+	return nil
+
+}
+
+func getWifiBitmap(db *sql.DB, phone string) uint {
+	var bitmap uint
+	err := db.QueryRow("SELECT bitmap FROM wifi_account WHERE phone = ?", phone).
+		Scan(&bitmap)
+	if err != nil {
+		log.Printf("getUserBitmap failed:%v", err)
+	}
+	return bitmap
+}
+
+func checkZteReg(db *sql.DB, bitmap, stype uint, phone string) error {
+	if bitmap&(1<<stype) == 0 {
+		code, err := zte.Register(phone, true, stype)
+		if err != nil {
+			log.Printf("PortalLogin zte register failed:%v", err)
+			return err
+		}
+		recordZteCode(db, phone, code, stype)
+		updateWifiBitmap(db, phone, (1 << stype))
+	}
+	return nil
+}
+
+func updateWifiBitmap(db *sql.DB, phone string, bitmap uint) {
+	_, err := db.Exec("UPDATE wifi_account SET bitmap = bitmap | ? WHERE phone = ?",
+		bitmap, phone)
+	if err != nil {
+		log.Printf("updateUserBitmap failed, phone:%s %v", phone, err)
+	}
+}
+
 //PortalLogin portal login
 func (s *Server) PortalLogin(ctx context.Context, req *verify.PortalLoginRequest,
 	rsp *verify.LoginResponse) error {
@@ -91,6 +167,14 @@ func zteLogin(phone, userip, usermac, acip, acname string, stype uint) (bool, er
 	log.Printf("PortalLogin zte loginnopass failed, phone:%s stype:%d",
 		phone, stype)
 	return flag, err
+}
+
+func isTestClickParam(info *verify.OneClickRequest) bool {
+	if info.Wlanacip == testAcip &&
+		info.Wlanuserip == testUserip && info.Wlanusermac == testUsermac {
+		return true
+	}
+	return false
 }
 
 func isTestParam(info *verify.PortalLoginRequest) bool {

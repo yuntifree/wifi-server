@@ -76,3 +76,25 @@ func portalLoginHandler(c *gin.Context) {
 		"portaltype": rsp.Portaltype, "adtype": rsp.Adtype,
 		"cover": rsp.Cover, "dst": rsp.Dst}})
 }
+
+type oneClickRequest struct {
+	Data verify.OneClickRequest `json:"data"`
+}
+
+func oneClickLoginHandler(c *gin.Context) {
+	var p oneClickRequest
+	if err := c.BindJSON(&p); err != nil {
+		c.JSON(http.StatusOK, gin.H{"errno": 1, "desc": err.Error()})
+		return
+	}
+	cl := verify.NewVerifyClient(verifyName, client.DefaultClient)
+	rsp, err := cl.OneClickLogin(context.Background(), &p.Data)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{"errno": 1, "desc": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"errno": 0, "data": map[string]interface{}{
+		"uid": rsp.Uid, "token": rsp.Token, "portaldir": rsp.Portaldir,
+		"portaltype": rsp.Portaltype, "adtype": rsp.Adtype,
+		"cover": rsp.Cover, "dst": rsp.Dst}})
+}
