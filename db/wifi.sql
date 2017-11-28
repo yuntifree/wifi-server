@@ -167,3 +167,18 @@ CREATE TABLE IF NOT EXISTS wx_token
     PRIMARY KEY(id),
     UNIQUE KEY(appid)
 ) ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS online_record
+(
+    id      bigint unsigned NOT NULL AUTO_INCREMENT,
+    phone   varchar(16) NOT NULL,
+    acname  varchar(32) NOT NULL DEFAULT '',
+    acip    varchar(32) NOT NULL DEFAULT '',
+    userip  varchar(32) NOT NULL DEFAULT '',
+    usermac varchar(32) NOT NULL DEFAULT '',
+    apmac   varchar(32) NOT NULL DEFAULT '',
+    ctime   datetime NOT NULL DEFAULT '2017-11-01',
+    PRIMARY KEY(id),
+    KEY(phone),
+    KEY(ctime)
+) ENGINE = InnoDB;

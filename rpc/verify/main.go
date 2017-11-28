@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 	"log"
 	"strings"
 	"time"
@@ -35,6 +36,37 @@ var db *sql.DB
 //Server server implement
 type Server struct{}
 
+func genOnlineTable() string {
+	now := time.Now()
+	return fmt.Sprintf("online_record_%04d%02d", now.Year(), now.Month())
+}
+
+func createOnlineTable(db *sql.DB, table string) error {
+	_, err := db.Exec(fmt.Sprintf(`CREATE TABLE IF NOT EXISTS %s LIKE 
+					online_record`, table))
+	if err != nil {
+		log.Printf("createOnlineTable %s failed:%v", table, err)
+		return err
+	}
+	return nil
+}
+
+func addOnlineRecord(db *sql.DB, phone, acname, acip, usermac, userip, apmac string) {
+	table := genOnlineTable()
+	err := createOnlineTable(db, table)
+	if err != nil {
+		log.Printf("addOnlineRecord online record failed:%s %v", phone, err)
+		return
+	}
+	query := fmt.Sprintf(`INSERT INTO %s(phone, acname, acip, usermac, userip,
+	apmac, ctime) VALUES (?, ?, ?, ?, ?, ?, NOW())`, table)
+	_, err = db.Exec(query,
+		phone, acname, acip, usermac, userip, apmac)
+	if err != nil {
+		log.Printf("addOnlineRecord online record failed:%s %v", phone, err)
+	}
+}
+
 //OneClickLogin one-click login
 func (s *Server) OneClickLogin(ctx context.Context, req *verify.OneClickRequest,
 	rsp *verify.LoginResponse) error {
@@ -65,6 +97,8 @@ func (s *Server) OneClickLogin(ctx context.Context, req *verify.OneClickRequest,
 			return err
 		}
 	}
+	addOnlineRecord(db, phone, req.Wlanacname, req.Wlanacip, req.Wlanusermac,
+		req.Wlanuserip, req.Wlanapmac)
 
 	var uid int64
 	var token string
@@ -92,14 +126,14 @@ func getWifiBitmap(db *sql.DB, phone string) uint {
 }
 
 func checkZteReg(db *sql.DB, bitmap, stype uint, phone string) error {
-	if bitmap&(1<<stype) == 0 {
+	if bitmap&(1<<(stype+2)) == 0 {
 		code, err := zte.Register(phone, true, stype)
 		if err != nil {
 			log.Printf("PortalLogin zte register failed:%v", err)
 			return err
 		}
 		recordZteCode(db, phone, code, stype)
-		updateWifiBitmap(db, phone, (1 << stype))
+		updateWifiBitmap(db, phone, (1 << (stype + 2)))
 	}
 	return nil
 }
@@ -126,6 +160,9 @@ func (s *Server) PortalLogin(ctx context.Context, req *verify.PortalLoginRequest
 
 	}
 	if !isTestParam(req) {
+		if zte.QueryOnline(req.Phone, stype) {
+			return errors.New("已经有设备登录")
+		}
 		flag, err := zteLogin(req.Phone, req.Wlanuserip,
 			req.Wlanusermac, req.Wlanacip, req.Wlanacname, stype)
 		if !flag {
@@ -145,9 +182,12 @@ func (s *Server) PortalLogin(ctx context.Context, req *verify.PortalLoginRequest
 		return err
 	}
 	recordUserMac(db, req.Wlanusermac, req.Phone)
-	rsp.Uid = uid
-	rsp.Token = token
+	addOnlineRecord(db, req.Phone, req.Wlanacname, req.Wlanacip, req.Wlanusermac,
+		req.Wlanuserip, req.Wlanapmac)
+	rsp.Uid = tstUid
+	rsp.Token = tstToken
 	rsp.Portaldir = portalDir
+	rsp.Portaltype = 1
 	return nil
 }
 
