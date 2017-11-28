@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"database/sql"
 	"fmt"
 	"log"
@@ -14,6 +13,7 @@ import (
 	"github.com/yuntifree/wifi-server/accounts"
 	"github.com/yuntifree/wifi-server/dbutil"
 	phone "github.com/yuntifree/wifi-server/proto/phone"
+	"golang.org/x/net/context"
 )
 
 const (

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"database/sql"
 	"log"
 	"time"
@@ -10,6 +9,7 @@ import (
 	micro "github.com/micro/go-micro"
 	"github.com/yuntifree/wifi-server/dbutil"
 	park "github.com/yuntifree/wifi-server/proto/park"
+	"golang.org/x/net/context"
 )
 
 var db *sql.DB
