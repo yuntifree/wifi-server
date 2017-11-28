@@ -9,10 +9,12 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	jsonp "github.com/tomwei7/gin-jsonp"
 )
 
 func main() {
 	router := gin.Default()
+	router.Use(jsonp.JsonP())
 	router.POST("/feedback/:action", feedbackHandler)
 	router.POST("/banner/:action", bannerHandler)
 	router.POST("/park/:action", parkHandler)
@@ -21,14 +23,14 @@ func main() {
 	router.POST("/trial/:action", trialHandler)
 	router.POST("/business/:action", businessHandler)
 	router.POST("/pay/:action", payHandler)
-	router.POST("/check_login", checkLoginHandler)
-	router.POST("/get_check_code", getCodeHandler)
-	router.POST("/portal_login", portalLoginHandler)
-	router.POST("/one_click_login", oneClickLoginHandler)
+	router.Static("/static/", "/data/wifi/html")
+	router.GET("/check_login", checkLoginHandler)
+	router.GET("/get_check_code", getCodeHandler)
+	router.GET("/portal_login", portalLoginHandler)
+	router.GET("/one_click_login", oneClickLoginHandler)
 	router.GET("/jumpwx", jumpHandler)
 	router.GET("/weixin/login", loginHandler)
 	router.GET("/pay/get_jsapi_sign", getJsapiSign)
-	router.Static("/static/", "/data/wifi/html")
 
 	srv := &http.Server{
 		Addr:    ":9898",
