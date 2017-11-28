@@ -25,7 +25,9 @@ const (
 	testAcip    = "120.197.159.10"
 	testUserip  = "10.96.72.28"
 	testUsermac = "f45c89987347"
-	portalDir   = "portal0406201704201946/index0406.html"
+	portalDir   = "http://api.yunxingzh.com/portal0406201704201946/index0406.html"
+	tstUid      = 137
+	tstToken    = "6ba9ac5a422d4473b337d57376dd3488"
 )
 
 var db *sql.DB
@@ -71,9 +73,10 @@ func (s *Server) OneClickLogin(ctx context.Context, req *verify.OneClickRequest,
 	if err != nil {
 		return err
 	}
-	rsp.Uid = uid
-	rsp.Token = token
+	rsp.Uid = tstUid
+	rsp.Token = tstToken
 	rsp.Portaldir = portalDir
+	rsp.Portaltype = 1
 	return nil
 
 }
