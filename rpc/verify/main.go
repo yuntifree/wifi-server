@@ -324,6 +324,22 @@ func isAutoMac(db *sql.DB, usermac, apmac string) int64 {
 	return 0
 }
 
+//CheckToken check user token
+func (s *Server) CheckToken(ctx context.Context, req *verify.TokenRequest,
+	rsp *verify.TokenResponse) error {
+	var etoken string
+	err := db.QueryRow(`SELECT token FROM users WHERE uid = ?`, req.Uid).
+		Scan(&etoken)
+	if err != nil {
+		log.Printf("CheckToken query token failed:%d %v", req.Uid, err)
+		return err
+	}
+	if req.Token != etoken {
+		return errors.New("token验证失败")
+	}
+	return nil
+}
+
 func main() {
 	var err error
 	db, err = dbutil.NewDB()

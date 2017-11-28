@@ -7,6 +7,15 @@ service Verify {
     rpc GetCheckCode(CodeRequest) returns (CodeResponse) {}
     rpc PortalLogin(PortalLoginRequest) returns  (LoginResponse) {}
     rpc OneClickLogin(OneClickRequest) returns (LoginResponse) {}
+    rpc CheckToken(TokenRequest) returns (TokenResponse) {}
+}
+
+message TokenRequest {
+    int64 uid = 1;
+    string token = 2;
+}
+
+message TokenResponse {
 }
 
 message OneClickRequest {
@@ -64,5 +73,6 @@ message CheckResponse {
     string dst = 9;
     string cover = 10;
 }
+
 
 

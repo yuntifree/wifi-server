@@ -36,6 +36,10 @@ type loginHallRequest struct {
 }
 
 func loginHall(c *gin.Context) {
+	if err := checkToken(c); err != nil {
+		c.JSON(http.StatusOK, gin.H{"errno": errParam, "desc": err.Error()})
+		return
+	}
 	var req loginHallRequest
 	if err := c.BindJSON(&req); err != nil {
 		c.JSON(http.StatusOK, gin.H{"errno": errParam, "desc": err.Error()})
@@ -55,6 +59,7 @@ func loginHall(c *gin.Context) {
 	var login hall.LoginRequest
 	login.Phone = req.Phone
 	login.Park = req.Park
+	login.Uid = c.Keys["uid"].(int64)
 	hl := hall.NewHallClient(hallName, client.DefaultClient)
 	res, err := hl.Login(context.Background(), &login)
 	if err != nil {

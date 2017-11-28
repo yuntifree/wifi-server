@@ -9,6 +9,7 @@ service Hall {
 message LoginRequest {
     string phone = 1;
     int64 park = 2;
+    int64 uid = 3;
 }
 
 message LoginResponse {

@@ -39,6 +39,11 @@ func (s *Server) Login(ctx context.Context, req *hall.LoginRequest,
 			return err
 		}
 	}
+	_, err = db.Exec(`UPDATE users SET wifi = ? WHERE uid = ?`, wid, req.Uid)
+	if err != nil {
+		log.Printf("Login update user wid failed:%d-%d %v", req.Uid, wid, err)
+		return err
+	}
 	rsp.Wid = wid
 	return nil
 }
