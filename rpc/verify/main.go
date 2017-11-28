@@ -203,6 +203,7 @@ func checkZteCode(db *sql.DB, phone, code string, stype uint) bool {
 func (s *Server) GetCheckCode(ctx context.Context, req *verify.CodeRequest,
 	rsp *verify.CodeResponse) error {
 	if !checkPhonePark(db, req.Phone, req.Wlanapmac) {
+		log.Printf("GetCheckCode checkPhonePark failed:%+v", req)
 		return errors.New("请先到公众号开通上网服务")
 	}
 	var stype uint
@@ -233,6 +234,7 @@ func checkPhonePark(db *sql.DB, phone, apmac string) bool {
 	if err != nil {
 		return false
 	}
+	log.Printf("park:%d real park:%d", park, epark)
 	if park == epark {
 		return true
 	}
